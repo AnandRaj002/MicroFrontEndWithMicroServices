@@ -5,3 +5,4 @@ This repository is related to application example for Micro Front End and Micro 
     * Visual Studio 2019 Community
     * Net Core 2.1
     * Postman latest version
+    * MySQL Version 8.0.19
