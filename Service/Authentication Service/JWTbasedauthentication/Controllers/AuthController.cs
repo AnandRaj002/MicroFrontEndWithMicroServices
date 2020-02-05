@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
+using JWTbasedauthentication.Managers;
 using System.Diagnostics;
 using MySql.Data;
 using MySql.Data.MySqlClient;
@@ -22,16 +23,28 @@ namespace JWTbasedauthentication.Controllers
     public class AuthController : Controller
     {
         private readonly IConfiguration _configuration;
+        private DatabaseManager dbManager = null;
+        private DataTable dtVal = null;
+
         public AuthController(IConfiguration configuration)
         {
             this._configuration = configuration;
         }
 
+        [HttpPost("login/{userName}/{password}")]
+        public IActionResult Login(string userName, string passWord)
+        {
+            if(this.CompareCredentials(userName, passWord))
+            {
+                var tokenStringResponse = this.GetAthorizeToken(userName);
+                return Ok(tokenStringResponse);
+            }
+            return BadRequest("Wrong Request");
+        }
+
         [HttpPost("token")]
         public IActionResult Token()
-        {
-            var connectionString = _configuration.GetConnectionString("mySQLConnectionString");            
-            
+        {            
             var header = Request.Headers["Authorization"];
             if(header.ToString().StartsWith("Basic"))
             {
@@ -40,7 +53,7 @@ namespace JWTbasedauthentication.Controllers
                 var usernameAndPwd = usernameAndPwdValue.Split(":");
 
                 // Verfiy Username and Password is valid or not use DB or any other methods
-                if(this.CompareCredentials(connectionString, usernameAndPwd[0], usernameAndPwd[1]))
+                if(this.CompareCredentials(usernameAndPwd[0], usernameAndPwd[1]))
                 {
                     // Create Claim Identity not mandatory which will check who can claim the token can use as role also
                     var claimdata = new[] { new Claim(ClaimTypes.Name, usernameAndPwd[0]) };
@@ -68,26 +81,43 @@ namespace JWTbasedauthentication.Controllers
             return BadRequest("Wrong Request");
         }
 
-        private bool CompareCredentials(string connectionString, string requestUserName, string requestPassword)
+        private bool CompareCredentials(string requestUserName, string requestPassword)
         {
-            DataTable dtVal = new DataTable();
+            List<MySqlParameter> mySqlParameters = new List<MySqlParameter>();
 
-            using (MySqlConnection myConn = new MySqlConnection(connectionString))
-            {
-                using (MySqlDataAdapter myAda = new MySqlDataAdapter($"Select * from users where first_name = '{requestUserName}';", myConn))
-                {
-                    myAda.Fill(dtVal);
-                }
-            }
+            mySqlParameters.Add(new MySqlParameter("userName", requestUserName));
+
+            dbManager = new DatabaseManager();
+
+            dtVal = dbManager.FetchDataWithSP(_configuration, "Login", mySqlParameters);
 
             if (dtVal.Rows.Count > 0)
             {
-                if (requestUserName == dtVal.Rows[0]["first_name"].ToString() && requestPassword == dtVal.Rows[0]["password"].ToString())
+                if (requestUserName == dtVal.Rows[0]["user_name"].ToString() && requestPassword == dtVal.Rows[0]["password"].ToString())
                 {
                     return true;
                 }                    
             }
             return false;
+        }
+
+        private string GetAthorizeToken(string userName)
+        {
+            var claimdata = new[] { new Claim(ClaimTypes.Name, userName)};
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("asdfsadfasdasdaasd"));
+            var signInCred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+
+            var token = new JwtSecurityToken(
+                    issuer: "testweb.com",
+                    audience: "testweb.com",
+                    expires: DateTime.Now.AddMinutes(4),
+                    claims: claimdata,
+                    signingCredentials: signInCred
+                );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return tokenString;
         }
     }
 }
