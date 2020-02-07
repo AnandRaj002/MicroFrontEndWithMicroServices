@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\aRaj\\source\\repos\\JWTbasedauthentication\\JWTbasedauthentication\\JWTbasedauthentication.csproj": {}
+    "C:\\Users\\aRaj\\Documents\\MicroFrontEndtoMicroService\\MicroFrontEndWithMicroServices\\Service\\Authentication Service\\JWTbasedauthentication\\JWTbasedauthentication.csproj": {}
   },
   "projects": {
-    "C:\\Users\\aRaj\\source\\repos\\JWTbasedauthentication\\JWTbasedauthentication\\JWTbasedauthentication.csproj": {
+    "C:\\Users\\aRaj\\Documents\\MicroFrontEndtoMicroService\\MicroFrontEndWithMicroServices\\Service\\Authentication Service\\JWTbasedauthentication\\JWTbasedauthentication.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\aRaj\\source\\repos\\JWTbasedauthentication\\JWTbasedauthentication\\JWTbasedauthentication.csproj",
+        "projectUniqueName": "C:\\Users\\aRaj\\Documents\\MicroFrontEndtoMicroService\\MicroFrontEndWithMicroServices\\Service\\Authentication Service\\JWTbasedauthentication\\JWTbasedauthentication.csproj",
         "projectName": "JWTbasedauthentication",
-        "projectPath": "C:\\Users\\aRaj\\source\\repos\\JWTbasedauthentication\\JWTbasedauthentication\\JWTbasedauthentication.csproj",
+        "projectPath": "C:\\Users\\aRaj\\Documents\\MicroFrontEndtoMicroService\\MicroFrontEndWithMicroServices\\Service\\Authentication Service\\JWTbasedauthentication\\JWTbasedauthentication.csproj",
         "packagesPath": "C:\\Users\\aRaj\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\aRaj\\source\\repos\\JWTbasedauthentication\\JWTbasedauthentication\\obj\\",
+        "outputPath": "C:\\Users\\aRaj\\Documents\\MicroFrontEndtoMicroService\\MicroFrontEndWithMicroServices\\Service\\Authentication Service\\JWTbasedauthentication\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\aRaj\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -58,6 +58,10 @@
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
               "version": "[2.1.10, )"
+            },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.0.19, )"
             }
           },
           "imports": [
