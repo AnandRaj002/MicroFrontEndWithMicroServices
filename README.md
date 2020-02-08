@@ -11,6 +11,7 @@ This repository is related to application example for Micro Front End and Micro 
 # Git Commands
     * git add .
     * git commit -m "message"
+    * git push origin your-branch
 
 # Test Service in PostMan
     * Open PostMan
