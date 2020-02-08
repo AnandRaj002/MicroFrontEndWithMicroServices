@@ -39,6 +39,31 @@ namespace JWTbasedauthentication.Managers
             }
 
             return dtVal;
-        }        
+        }
+
+        public int ExecureDataWithSP(IConfiguration configuration, string query, List<MySqlParameter> mySqlParameters)
+        {
+            var connectionString = configuration.GetConnectionString("mySQLConnectionString");
+
+            int result = 0;
+
+            using (MySqlConnection myConn = new MySqlConnection(connectionString))
+            {
+                myConn.Open();
+                using (MySqlCommand myCmd = new MySqlCommand(query, myConn))
+                {
+                    myCmd.CommandType = CommandType.StoredProcedure;
+
+                    if (mySqlParameters != null)
+                    {
+                        mySqlParameters.ForEach(val => myCmd.Parameters.Add(val));
+                    }
+
+                   result = myCmd.ExecuteNonQuery();
+                }
+            }
+
+            return result;
+        }
     }
 }

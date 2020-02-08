@@ -14,6 +14,7 @@ using System.Diagnostics;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Data;
+using JWTbasedauthentication.Models;
 
 namespace JWTbasedauthentication.Controllers
 {
@@ -31,12 +32,22 @@ namespace JWTbasedauthentication.Controllers
             this._configuration = configuration;
         }
 
-        [HttpPost("login/{userName}/{password}")]
-        public IActionResult Login(string userName, string passWord)
+        [HttpPost("register")]
+        public IActionResult Register(UserModel userModel)
         {
-            if(this.CompareCredentials(userName, passWord))
+            if(this.RegisterUser(_configuration, userModel) > 0)
             {
-                var tokenStringResponse = this.GetAthorizeToken(userName);
+                return Ok($"{userModel.UserName} registered sucessfully");
+            }
+            return BadRequest("Not able to register");
+        }
+                
+        [HttpPost("login")]
+        public IActionResult Login(IdentityModel identity)
+        {
+            if(this.CompareCredentials(identity.UserName, identity.Password))
+            {
+                var tokenStringResponse = this.GetAthorizeToken(identity.UserName);
                 return Ok(tokenStringResponse);
             }
             return BadRequest("Wrong Request");
@@ -81,6 +92,8 @@ namespace JWTbasedauthentication.Controllers
             return BadRequest("Wrong Request");
         }
 
+        #region PrivateMethods
+
         private bool CompareCredentials(string requestUserName, string requestPassword)
         {
             List<MySqlParameter> mySqlParameters = new List<MySqlParameter>();
@@ -93,7 +106,7 @@ namespace JWTbasedauthentication.Controllers
 
             if (dtVal.Rows.Count > 0)
             {
-                if (requestUserName == dtVal.Rows[0]["user_name"].ToString() && requestPassword == dtVal.Rows[0]["password"].ToString())
+                if (requestUserName == dtVal.Rows[0]["user_name"].ToString() && this.VerifyHash(requestPassword, dtVal.Rows[0]["password"].ToString(), dtVal.Rows[0]["passwordsalt"].ToString()))
                 {
                     return true;
                 }                    
@@ -119,5 +132,53 @@ namespace JWTbasedauthentication.Controllers
 
             return tokenString;
         }
+
+        private int RegisterUser(IConfiguration configuration, UserModel userModel)
+        {
+            List<MySqlParameter> mySqlParameters = new List<MySqlParameter>();
+            byte[] passwordSalt = null;
+
+            var passwordHash = this.CreateHash(userModel.Password, out passwordSalt);
+
+            mySqlParameters.Add(new MySqlParameter("userName", userModel.UserName));
+            mySqlParameters.Add(new MySqlParameter("firstName", userModel.FirstName));
+            mySqlParameters.Add(new MySqlParameter("lastName", userModel.LastName));
+            mySqlParameters.Add(new MySqlParameter("email", userModel.Email));
+            mySqlParameters.Add(new MySqlParameter("password", passwordHash));
+            mySqlParameters.Add(new MySqlParameter("passwordSalt", Convert.ToBase64String(passwordSalt)));
+
+            dbManager = new DatabaseManager();
+
+            var recordUpdated = dbManager.ExecureDataWithSP(configuration, "Register_User", mySqlParameters);
+
+            return recordUpdated;
+        }
+                
+        private string CreateHash(string password, out byte[] passwordSalt)
+        {
+            byte[] passwordHash = null;
+            using (var hash = new System.Security.Cryptography.HMACSHA256()) 
+            {
+                passwordSalt = hash.Key;
+                passwordHash = hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));       
+            }            
+
+            return Convert.ToBase64String(passwordHash);
+        }
+
+        private bool VerifyHash(string password, string hashPassword, string hashSalt)
+        {
+            byte[] passwordHash = null;
+            using (var hash = new System.Security.Cryptography.HMACSHA256(Convert.FromBase64String(hashSalt)))
+            {
+                passwordHash = hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+
+            if (Convert.ToBase64String(passwordHash) == hashPassword)
+                return true;
+            return false;
+        }
+
+        #endregion
     }
 }

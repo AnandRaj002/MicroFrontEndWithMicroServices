@@ -23,6 +23,7 @@ CREATE TABLE users (
   last_name varchar(100),
   email varchar(100),
   password varchar(255),
+  salt varchar(255),  
   created_date datetime,
   updated_date datetime,
   PRIMARY KEY (id)
