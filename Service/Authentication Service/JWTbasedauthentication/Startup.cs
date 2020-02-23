@@ -44,6 +44,14 @@ namespace JWTbasedauthentication
             services.Configure<AppSettings>(appSettingsConnectionString);
 
             services.AddScoped<IUserManager, UserManager>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +66,7 @@ namespace JWTbasedauthentication
                 app.UseHsts();
             }
 
+            app.UseCors("EnableCORS");
             app.UseAuthentication(); // To Use Authentication in Api Solution
             app.UseHttpsRedirection();
             app.UseMvc();

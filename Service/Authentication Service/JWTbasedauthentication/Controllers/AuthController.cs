@@ -53,7 +53,7 @@ namespace JWTbasedauthentication.Controllers
                     var tokenStringResponse = _userManager.GetAthorizeToken(identity.UserName);
                     return Ok(tokenStringResponse);
                 }
-                return BadRequest($"{identity.UserName} not registered with system.");
+                return NotFound($"{identity.UserName} not registered with system.");
             }
             catch(Exception ex)
             {

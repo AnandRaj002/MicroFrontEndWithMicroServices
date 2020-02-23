@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Registation</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">    
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h4><a href="index.html">Hobbyist</a></h4>
+            </div>
+            <ul class="nav-links">
+                <li><a href="Login.html">Login</a></li>
+                <li><a href="Register.html">Register</a></li>                
+            </ul>
+            <div class="burger">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+        </nav>    
+    </header>
+
+    <form id="authRegister">
+        <label for="UserName">User Name</label>
+        <input type="text" id="UserName" required>
+        <br>
+        <label for="FisrtName">First Name</label>
+        <input type="text" id="FirstName" required>
+        <br>
+        <label for="LastName">Last Name</label>
+        <input type="text" id="LastName" required>
+        <br>
+        <label for="Email">Email</label>
+        <input type="email" id="Email" required>
+        <br>
+        <label for="Password">Password</label>
+        <input type="password" id="Password" required>
+        <br>
+        <input type="submit" id="btnSubmit" value="Register">
+    </form>
+    <hr>
+    <label id="lValue" for="SucessMessage">Test Message</label>
+    <script src="javascript/app.js"></script>
+    <script src="javascript/appRegister.js" type="text/javascript"></script>
+</body>
+</html>
